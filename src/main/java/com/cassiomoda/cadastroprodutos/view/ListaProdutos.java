@@ -9,11 +9,17 @@ import com.cassiomoda.cadastroprodutos.model.Produto;
 import com.cassiomoda.cadastroprodutos.util.Utils;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -87,6 +93,7 @@ public class ListaProdutos extends javax.swing.JFrame {
         btnNovo = new javax.swing.JButton();
         btnEditar = new javax.swing.JButton();
         btnExcluir = new javax.swing.JButton();
+        btnRelatorio = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabProdutos = new javax.swing.JTable();
 
@@ -156,6 +163,13 @@ public class ListaProdutos extends javax.swing.JFrame {
             }
         });
 
+        btnRelatorio.setText("Gerar relatório");
+        btnRelatorio.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnRelatorioMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlBotoesLayout = new javax.swing.GroupLayout(pnlBotoes);
         pnlBotoes.setLayout(pnlBotoesLayout);
         pnlBotoesLayout.setHorizontalGroup(
@@ -167,6 +181,8 @@ public class ListaProdutos extends javax.swing.JFrame {
                 .addComponent(btnEditar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnExcluir)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRelatorio)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlBotoesLayout.setVerticalGroup(
@@ -176,7 +192,8 @@ public class ListaProdutos extends javax.swing.JFrame {
                 .addGroup(pnlBotoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnNovo)
                     .addComponent(btnEditar)
-                    .addComponent(btnExcluir))
+                    .addComponent(btnExcluir)
+                    .addComponent(btnRelatorio))
                 .addContainerGap())
         );
 
@@ -305,6 +322,27 @@ public class ListaProdutos extends javax.swing.JFrame {
         atualizarLista(txtFiltroNome.getText());
     }//GEN-LAST:event_txtFiltroNomeKeyReleased
 
+    private void btnRelatorioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRelatorioMouseClicked
+        
+        try {
+//            JasperDesign desenho = JRXmlLoader.load(
+//                    "C:\\dev\\java\\cadastroProdutos\\src\\main\\resources\\CadastroProdutos\\ProdutosCadastrados.jrxml");
+//            JasperReport relatorio = JasperCompileManager.compileReport(desenho);
+            Map parametros = new HashMap();
+//            JasperPrint impressao = JasperFillManager.fillReport(relatorio, parametros);
+            
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+            ProdutoJpaController prodCtrl = new ProdutoJpaController(emf);
+            List<Produto> lista = prodCtrl.findProdutoEntities();
+            JRBeanCollectionDataSource jrBean = new JRBeanCollectionDataSource(lista);
+            JasperPrint impressao = JasperFillManager.fillReport("C:\\dev\\java\\cadastroProdutos\\src\\main\\resources\\CadastroProdutos\\ProdutosCadastrados.jasper", parametros, jrBean);
+            JasperViewer viwer = new JasperViewer(impressao, true);
+            viwer.setVisible(true);
+        } catch (Exception ext) {
+            JOptionPane.showMessageDialog(this, "Erro: " + ext.getMessage() + ". Ao tentar gerar o relatório.");
+        }
+    }//GEN-LAST:event_btnRelatorioMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -339,6 +377,7 @@ public class ListaProdutos extends javax.swing.JFrame {
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnNovo;
     private javax.swing.JButton btnPesquisar;
+    private javax.swing.JButton btnRelatorio;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblPesquisarPorNome;
     private javax.swing.JPanel pnlBotoes;
