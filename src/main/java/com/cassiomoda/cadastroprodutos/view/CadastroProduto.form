@@ -143,6 +143,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Gravar"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnGravarMouseClicked"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnCancelar">
           <Properties>
@@ -167,6 +170,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtCadastradoEm">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblAlteradoEm">
       <Properties>
@@ -174,6 +180,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txtAlteradoEm">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblCategoria">
       <Properties>

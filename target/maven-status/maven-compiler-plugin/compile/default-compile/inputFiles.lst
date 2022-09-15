@@ -1,2 +1,11 @@
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\model\Produto.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\exceptions\PreexistingEntityException.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\model\Categoria.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\exceptions\NonexistentEntityException.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\util\Utils.java
 C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\CadastroProdutos.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\exceptions\IllegalOrphanException.java
 C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\view\ListaProdutos.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\controllers\ProdutoJpaController.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\view\CadastroProduto.java
+C:\dev\java\cadastroProdutos\src\main\java\com\cassiomoda\cadastroprodutos\controllers\CategoriaJpaController.java

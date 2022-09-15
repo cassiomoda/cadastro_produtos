@@ -7,9 +7,12 @@ package com.cassiomoda.cadastroprodutos.view;
 import com.cassiomoda.cadastroprodutos.controllers.ProdutoJpaController;
 import com.cassiomoda.cadastroprodutos.model.Produto;
 import com.cassiomoda.cadastroprodutos.util.Utils;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -24,11 +27,21 @@ public class ListaProdutos extends javax.swing.JFrame {
     public ListaProdutos() {
         initComponents();
         
+        atualizarLista(null);
+    }
+    
+    public void atualizarLista(String nome) {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
         ProdutoJpaController prodCtrl = new ProdutoJpaController(emf);
-        List<Produto> listaProdutos = prodCtrl.findProdutoEntities();
+        List<Produto> listaProdutos = prodCtrl.findProdutoByName(nome);
         
-        DefaultTableModel modelo = new DefaultTableModel();
+        DefaultTableModel modelo = new DefaultTableModel() {
+            
+            @Override
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
+        };
         modelo.addColumn("ID");
         modelo.addColumn("Nome");
         modelo.addColumn("Cadastrado em");
@@ -46,6 +59,15 @@ public class ListaProdutos extends javax.swing.JFrame {
         }
         
         tabProdutos.setModel(modelo);
+        
+        tabProdutos.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    btnEditar.doClick();
+                }
+            }
+        });
     }
 
     /**
@@ -74,7 +96,18 @@ public class ListaProdutos extends javax.swing.JFrame {
 
         lblPesquisarPorNome.setText("Pesquisar por nome");
 
+        txtFiltroNome.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtFiltroNomeKeyReleased(evt);
+            }
+        });
+
         btnPesquisar.setText("Pesquisar");
+        btnPesquisar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnPesquisarMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlFiltroLayout = new javax.swing.GroupLayout(pnlFiltro);
         pnlFiltro.setLayout(pnlFiltroLayout);
@@ -110,8 +143,18 @@ public class ListaProdutos extends javax.swing.JFrame {
         });
 
         btnEditar.setText("Editar");
+        btnEditar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnEditarMouseClicked(evt);
+            }
+        });
 
         btnExcluir.setText("Excluir");
+        btnExcluir.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnExcluirMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlBotoesLayout = new javax.swing.GroupLayout(pnlBotoes);
         pnlBotoes.setLayout(pnlBotoesLayout);
@@ -148,9 +191,16 @@ public class ListaProdutos extends javax.swing.JFrame {
             Class[] types = new Class [] {
                 java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         jScrollPane1.setViewportView(tabProdutos);
@@ -182,13 +232,78 @@ public class ListaProdutos extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnNovoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnNovoMouseClicked
+    private void abrirCadastroProduto(Produto produto) {
         
         this.setEnabled(false);
         CadastroProduto cadastro = new CadastroProduto(this);
+        
+        if (produto != null) {
+            cadastro.setProduto(produto);
+        } else {
+            cadastro.setProduto(new Produto());
+        }
+        
         cadastro.setBounds(this.getX() + 50, this.getY() + 50, 800, 600);
         cadastro.setVisible(true);
+    }
+    
+    private void btnNovoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnNovoMouseClicked
+        
+        abrirCadastroProduto(null);
     }//GEN-LAST:event_btnNovoMouseClicked
+
+    private Produto getProdutoSelecionado() {
+        Integer linhaSelecionada = tabProdutos.getSelectedRow();
+        
+        if (linhaSelecionada > 0) {
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+            ProdutoJpaController prodCtrl = new ProdutoJpaController(emf);
+            Produto produto = prodCtrl.findProduto((int) tabProdutos.getValueAt(linhaSelecionada, 0));
+            return produto;
+        }
+        
+        return null;
+    }
+    
+    private void btnEditarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEditarMouseClicked
+        
+        Produto produto = getProdutoSelecionado();
+        
+        if (produto != null) {
+            abrirCadastroProduto(produto);
+        }
+    }//GEN-LAST:event_btnEditarMouseClicked
+
+    private void btnExcluirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnExcluirMouseClicked
+        
+        Produto produto = getProdutoSelecionado();
+        
+        if (produto != null) {
+            int excluir = JOptionPane.showConfirmDialog(this, "Deseja excluir o registro selecionado?");
+            
+            if (excluir == 0) {
+                EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+                ProdutoJpaController prodCtrl = new ProdutoJpaController(emf);
+                
+                try {
+                    prodCtrl.destroy(produto.getId());
+                    atualizarLista(null);
+                } catch(Exception ext) {
+                    JOptionPane.showMessageDialog(this, "Erro: " + ext.getMessage() + ". Ao tentar excluir o produto.");
+                }
+            }
+        }
+    }//GEN-LAST:event_btnExcluirMouseClicked
+
+    private void btnPesquisarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPesquisarMouseClicked
+        
+        atualizarLista(txtFiltroNome.getText());
+    }//GEN-LAST:event_btnPesquisarMouseClicked
+
+    private void txtFiltroNomeKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroNomeKeyReleased
+        
+        atualizarLista(txtFiltroNome.getText());
+    }//GEN-LAST:event_txtFiltroNomeKeyReleased
 
     /**
      * @param args the command line arguments

@@ -5,11 +5,15 @@
 package com.cassiomoda.cadastroprodutos.view;
 
 import com.cassiomoda.cadastroprodutos.controllers.CategoriaJpaController;
+import com.cassiomoda.cadastroprodutos.controllers.ProdutoJpaController;
 import com.cassiomoda.cadastroprodutos.model.Categoria;
 import com.cassiomoda.cadastroprodutos.model.Produto;
+import com.cassiomoda.cadastroprodutos.util.Utils;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -101,6 +105,11 @@ public class CadastroProduto extends javax.swing.JFrame {
         );
 
         btnGravar.setText("Gravar");
+        btnGravar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnGravarMouseClicked(evt);
+            }
+        });
 
         btnCancelar.setText("Cancelar");
         btnCancelar.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -133,7 +142,11 @@ public class CadastroProduto extends javax.swing.JFrame {
 
         lblCadastradoEm.setText("Cadastrado em");
 
+        txtCadastradoEm.setEditable(false);
+
         lblAlteradoEm.setText("Alterado em");
+
+        txtAlteradoEm.setEditable(false);
 
         lblCategoria.setText("Categoria");
 
@@ -199,7 +212,17 @@ public class CadastroProduto extends javax.swing.JFrame {
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         
         if (produto != null) {
-            lblIdProduto.setText("ID: " + produto.getId().toString());
+            if (produto.getId() != null && produto.getId() > 0) {
+                lblIdProduto.setText("ID: " + produto.getId().toString());
+                txtNome.setText(produto.getNome());
+                txtCadastradoEm.setText(Utils.formatarData(produto.getDataCadastro()));
+                txtAlteradoEm.setText(Utils.formatarData(produto.getDataAlteracao()));
+
+                String txtCbCategoria = produto.getCategoria().getId().toString() 
+                        + "-" + produto.getCategoria().getNome();
+
+                cbCategoria.setSelectedItem(txtCbCategoria);
+            }
         }
     }//GEN-LAST:event_formWindowActivated
 
@@ -207,6 +230,49 @@ public class CadastroProduto extends javax.swing.JFrame {
         listaProdutos.setEnabled(true);
         this.dispose();
     }//GEN-LAST:event_btnCancelarMouseClicked
+
+    private void btnGravarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGravarMouseClicked
+        
+        if (txtNome.getText().isEmpty()) {
+            txtNome.requestFocus();
+            JOptionPane.showMessageDialog(this, "O Nome precisa ser preenchido.");
+        }
+        
+        produto.setNome(txtNome.getText());
+        
+        if (produto.getId() == null) {
+            produto.setDataCadastro(new Timestamp(System.currentTimeMillis()));
+        } else {
+            produto.setDataAlteracao(new Timestamp(System.currentTimeMillis()));
+        }
+        
+        String strIdCategoria = cbCategoria.getSelectedItem().toString();
+        strIdCategoria = strIdCategoria.substring(0, strIdCategoria.indexOf("-"));
+        
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("persistence");
+        CategoriaJpaController categoriaCtrl = new CategoriaJpaController(emf);
+        Categoria categoria = categoriaCtrl.findCategoria(Integer.parseInt(strIdCategoria));
+        
+        produto.setCategoria(categoria);
+        
+        ProdutoJpaController prodCtrl = new ProdutoJpaController(emf);
+        
+        try {
+            if (produto.getId() == null) {
+                int idProd = prodCtrl.getProdutoCount() + 1;
+                produto.setId(idProd);
+                prodCtrl.create(produto);
+            } else {
+                prodCtrl.edit(produto);
+            }
+            
+            listaProdutos.setEnabled(true);
+            listaProdutos.atualizarLista(null);
+            this.dispose();
+        } catch (Exception ext) {
+            JOptionPane.showMessageDialog(this, "Erro: " + ext.getMessage() + ". Ao tentar gravar o Produto.");
+        }
+    }//GEN-LAST:event_btnGravarMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;

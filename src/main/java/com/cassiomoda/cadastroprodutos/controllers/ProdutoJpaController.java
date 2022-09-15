@@ -118,11 +118,15 @@ public class ProdutoJpaController implements Serializable {
         }
     }
     
-    private List<Produto> findProdutoByName(String name) {
+    public List<Produto> findProdutoByName(String name) {
         EntityManager em = getEntityManager();
         try {
+            if (name == null || name.isEmpty()) {
+                return findProdutoEntities();
+            }
+            
             StringBuilder sql = new StringBuilder();
-            sql.append("select o from Produto o where o.nome like '" + name + "'");
+            sql.append("select o from Produto o where upper(o.nome) like upper('%" + name + "%')");
             Query q = em.createQuery(sql.toString());
             return q.getResultList();
         } finally {
