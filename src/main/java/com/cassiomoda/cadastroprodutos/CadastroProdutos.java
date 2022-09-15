@@ -15,6 +15,7 @@ public class CadastroProdutos {
 
     public static void main(String[] args) {
         ListaProdutos listaProdutos = new ListaProdutos();
+        listaProdutos.setBounds(100, 100, 800, 600);
         listaProdutos.setVisible(true);
     }
 }
