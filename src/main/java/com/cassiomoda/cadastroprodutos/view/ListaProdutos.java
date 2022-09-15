@@ -6,6 +6,7 @@ package com.cassiomoda.cadastroprodutos.view;
 
 import com.cassiomoda.cadastroprodutos.controllers.ProdutoJpaController;
 import com.cassiomoda.cadastroprodutos.model.Produto;
+import com.cassiomoda.cadastroprodutos.util.Utils;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -38,8 +39,8 @@ public class ListaProdutos extends javax.swing.JFrame {
             modelo.addRow(new Object[]{
                 produto.getId(),
                 produto.getNome(),
-                produto.getDataCadastro(),
-                produto.getDataAlteracao(),
+                Utils.formatarData(produto.getDataCadastro()),
+                Utils.formatarData(produto.getDataAlteracao()),
                 produto.getCategoria().getNome()
             });
         }
