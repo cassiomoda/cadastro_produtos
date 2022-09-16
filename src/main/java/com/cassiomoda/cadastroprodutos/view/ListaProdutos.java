@@ -9,22 +9,11 @@ import com.cassiomoda.cadastroprodutos.model.Produto;
 import com.cassiomoda.cadastroprodutos.util.Utils;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -329,22 +318,8 @@ public class ListaProdutos extends javax.swing.JFrame {
 
     private void btnRelatorioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRelatorioMouseClicked
         
-        try {
-            JasperDesign desenho = JRXmlLoader.load(
-                    "C:\\dev\\java\\cadastroProdutos\\src\\main\\resources\\CadastroProdutos\\ProdutosCadastrados.jrxml");
-            JasperReport relatorio = JasperCompileManager.compileReport(desenho);
-
-            Connection conexao = null;
-            Class.forName("org.firebirdsql.jdbc.FBDriver");
-            conexao = DriverManager.getConnection("jdbc:firebirdsql://localhost:3050/C:\\dev\\java\\cadastroProdutos\\db\\CADPRODUTO.FDB", "SYSDBA", "Tigre401!");
-
-            Map parametros = new HashMap();
-            JasperPrint impressao = JasperFillManager.fillReport(relatorio, parametros, conexao);
-            JasperViewer viwer = new JasperViewer(impressao, true);
-            viwer.setVisible(true);
-        } catch (Exception ext) {
-            JOptionPane.showMessageDialog(this, "Erro: " + ext.getMessage() + ". Ao tentar gerar o relatório.");
-        }
+        Relatorio relatorio = new Relatorio();
+        relatorio.gerarRelatorio();
     }//GEN-LAST:event_btnRelatorioMouseClicked
 
     /**
