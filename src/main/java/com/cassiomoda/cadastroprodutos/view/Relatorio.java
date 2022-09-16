@@ -4,12 +4,12 @@
  */
 package com.cassiomoda.cadastroprodutos.view;
 
+import com.cassiomoda.cadastroprodutos.util.Utils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -33,17 +33,25 @@ public class Relatorio extends javax.swing.JFrame {
     
     public void gerarRelatorio() {
         try {
-            JasperDesign desenho = JRXmlLoader.load(
-                    "C:\\dev\\java\\cadastroProdutos\\src\\main\\resources\\CadastroProdutos\\ProdutosCadastrados.jrxml");
-            JasperReport relatorio = JasperCompileManager.compileReport(desenho);
+            String caminhoApp = Utils.getPath();
+            
+            if (caminhoApp.indexOf("Erro") < 0) {
+                JasperDesign desenho = JRXmlLoader.load(
+                        caminhoApp + "\\src\\main\\resources\\CadastroProdutos\\ProdutosCadastrados.jrxml");
+                JasperReport relatorio = JasperCompileManager.compileReport(desenho);
 
-            Connection conexao = null;
-            Class.forName("org.firebirdsql.jdbc.FBDriver");
-            conexao = DriverManager.getConnection("jdbc:firebirdsql://localhost:3050/C:\\dev\\java\\cadastroProdutos\\db\\CADPRODUTO.FDB", "SYSDBA", "Tigre401!");
-
-            Map parametros = new HashMap();
-            JasperPrint impressao = JasperFillManager.fillReport(relatorio, parametros, conexao);
-            JasperViewer.viewReport(impressao, false);
+                Connection conexao = Utils.getConnection();
+                
+                if (conexao != null) {
+                    Map parametros = new HashMap();
+                    JasperPrint impressao = JasperFillManager.fillReport(relatorio, parametros, conexao);
+                    JasperViewer.viewReport(impressao, false);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Não foi possível recuperar a conexão para gerar o relatório.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, caminhoApp);
+            }
         } catch (Exception ext) {
             JOptionPane.showMessageDialog(this, "Erro: " + ext.getMessage() + ". Ao tentar gerar o relatório.");
         }
